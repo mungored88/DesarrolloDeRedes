@@ -1,5 +1,0 @@
-sceneSetups:
-- path: Assets/Scenes/Modelo y Algorimo scene/Chinatown mya.unity
-  isLoaded: 1
-  isActive: 1
-  isSubScene: 0
