@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/Modelo y Algorimo scene/Menu.unity
+    guid: 6202eec34a3c051438e9e67fc6825a52
+  - enabled: 1
     path: Assets/Scenes/Modelo y Algorimo scene/Level.unity
     guid: 7a8812231d3d85f4ab2d85da6a1c2ac2
   - enabled: 1
