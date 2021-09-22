@@ -12,9 +12,7 @@ public class DefeatScreen : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        // Remove the player from the Photon room and disconnect
-        PhotonNetwork.LeaveRoom();
-        PhotonNetwork.Disconnect();
+        LeaveRoomAndDisconnect();
         
         // Show countdown
         StartCoroutine(Countdown());
@@ -34,6 +32,13 @@ public class DefeatScreen : MonoBehaviour
         }
 
         UnityEngine.SceneManagement.SceneManager.LoadScene(0);
+    }
+
+    public static void LeaveRoomAndDisconnect()
+    {
+        // Remove the player from the Photon room and disconnect
+        PhotonNetwork.LeaveRoom();
+        PhotonNetwork.Disconnect();
     }
     
 }

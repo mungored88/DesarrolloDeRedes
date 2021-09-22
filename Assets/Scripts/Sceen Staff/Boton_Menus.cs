@@ -7,6 +7,7 @@ public class Boton_Menus : MonoBehaviour
 {
     public void ClickInBoton(string scene)
     {
+        DefeatScreen.LeaveRoomAndDisconnect();
         SceneManager.LoadScene(scene);
     }
     public void Restart()
