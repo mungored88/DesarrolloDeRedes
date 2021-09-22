@@ -1,16 +1,28 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-public class Pathfinding : MonoBehaviour 
+public class Pathfinding : MonoBehaviour
 {
 
     public Grid GridReference;
     public Transform StartPosition;
     public Transform TargetPosition;
+    private List<Transform> PlayerList = new List<Transform>();
 
-    public  List<Node> EnemyPath; 
+    private void OnEnable()
+    {
+        Player.NotifyPlayerDie += RemovePlayerToList;
+    }
 
+    public List<Node> EnemyPath;
+
+
+    public void Awake()
+    {
+        PlayerList = FindObjectsOfType<Player>().Select(player1 => player1.transform).ToList();
+    }
     private void Start()
     {
         GridReference = GetComponent<Grid>();
@@ -19,8 +31,33 @@ public class Pathfinding : MonoBehaviour
 
     private void Update()
     {
-        
+        GetNearestPlay();
+
+
         EnemyPath = FindPath(StartPosition.position, TargetPosition.position);
+
+    }
+    private void  GetNearestPlay()
+    {
+        if (PlayerList.Count == 1)
+        {
+            TargetPosition = PlayerList[0];
+        }
+        else
+        {
+            if (Vector3.Distance(transform.position, PlayerList[0].position) < Vector3.Distance(transform.position, PlayerList[1].position))
+            {
+                TargetPosition = PlayerList[0];
+            }
+            else
+            {
+                TargetPosition = PlayerList[1];
+            }
+        }
+    }
+
+    public void RemovePlayerToList(Player T) 
+    { 
 
     }
 
