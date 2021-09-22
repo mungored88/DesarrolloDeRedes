@@ -96,14 +96,14 @@ public class Player : Entity , ICollector, IDamageable, IObservable
     
     public void Die()
     {
-        PlayerLost(this);
+        if (PlayerLost != null) PlayerLost(this);
 
         _playerView.animator.Die();
         this.enabled = false;
         Invoke("changeScene",5);
     }
     public delegate void NotifyPlayerDie(Player T);
-    public NotifyPlayerDie PlayerLost;
+    public static NotifyPlayerDie PlayerLost;
 
 
     //deberia estar en un game manager :)

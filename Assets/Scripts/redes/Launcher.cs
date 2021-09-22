@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
@@ -7,6 +8,12 @@ using Photon.Realtime;
 public class Launcher : MonoBehaviourPunCallbacks
 {
     public GameObject mainScreen, connectedScreen;
+
+    private void Start()
+    {
+        Cursor.lockState = CursorLockMode.Confined;
+        Cursor.visible = true;
+    }
 
     public void BtnConnect()
     {

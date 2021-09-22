@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -9,56 +10,65 @@ public class Pathfinding : MonoBehaviour
     public Grid GridReference;
     public Transform StartPosition;
     public Transform TargetPosition;
-    private List<Transform> PlayerList = new List<Transform>();
+    [SerializeField] private List<Player> PlayerList = new List<Player>();
 
+    //public Player.NotifyPlayerDie _notifiPlayerDie;
+    
     private void OnEnable()
     {
-        Player.NotifyPlayerDie += RemovePlayerToList;
+        Player.PlayerLost += RemovePlayerFromList;
+    }
+
+    private void OnDisable()
+    {
+        Player.PlayerLost -= RemovePlayerFromList;
     }
 
     public List<Node> EnemyPath;
 
-
-    public void Awake()
-    {
-        PlayerList = FindObjectsOfType<Player>().Select(player1 => player1.transform).ToList();
-    }
     private void Start()
     {
+        //Player.PlayerLost += RemovePlayerFromList;
+        PlayerList = FindObjectsOfType<Player>().ToList();
         GridReference = GetComponent<Grid>();
     }
 
 
     private void Update()
     {
-        GetNearestPlay();
-
-
+        // if the scene has no players, then do nothing
+        if (PlayerList.Count == 0) return;
+        
+        
+        SetNearestPlayer();
         EnemyPath = FindPath(StartPosition.position, TargetPosition.position);
-
     }
-    private void  GetNearestPlay()
+    private void  SetNearestPlayer()
     {
         if (PlayerList.Count == 1)
         {
-            TargetPosition = PlayerList[0];
+            TargetPosition = PlayerList[0].transform;
         }
         else
         {
-            if (Vector3.Distance(transform.position, PlayerList[0].position) < Vector3.Distance(transform.position, PlayerList[1].position))
+            if (Vector3.Distance(transform.position, PlayerList[0].transform.position) < 
+                Vector3.Distance(transform.position, PlayerList[1].transform.position))
             {
-                TargetPosition = PlayerList[0];
+                TargetPosition = PlayerList[0].transform;
             }
             else
             {
-                TargetPosition = PlayerList[1];
+                TargetPosition = PlayerList[1].transform;
             }
         }
     }
 
-    public void RemovePlayerToList(Player T) 
-    { 
-
+    public void RemovePlayerFromList(Player T) 
+    {
+        if (PlayerList.Contains(T))
+        {
+            PlayerList.Remove(T);
+        }
     }
 
     List<Node> FindPath(Vector3 a_StartPos, Vector3 a_TargetPos)
