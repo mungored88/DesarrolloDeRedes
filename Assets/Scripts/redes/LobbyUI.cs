@@ -13,7 +13,7 @@ public class LobbyUI : MonoBehaviourPunCallbacks
     {
         RoomOptions option = new RoomOptions();
 
-        option.MaxPlayers = 4;
+        option.MaxPlayers = 2;
 
         PhotonNetwork.CreateRoom(createInputField.text, option);
     }
@@ -30,16 +30,29 @@ public class LobbyUI : MonoBehaviourPunCallbacks
 
     public void BtnJoinRoom()
     {
+        
         PhotonNetwork.JoinRoom(joinInputField.text);
     }
 
     public override void OnJoinedRoom()
     {
-        PhotonNetwork.LoadLevel("Level");
+        // show message
+        StartCoroutine(StartGameAfterTwoPlayersConnect());
+        // wait for other players...
+        //PhotonNetwork.LoadLevel("Level");
     }
 
     public override void OnJoinRoomFailed(short returnCode, string message)
     {
         Debug.Log("Failed join room " + returnCode + " Message: " + message);
+    }
+
+    private IEnumerator StartGameAfterTwoPlayersConnect()
+    {
+        while (PhotonNetwork.PlayerList.Length < 2)
+        {
+            yield return new WaitForSeconds(0.15f);
+        }
+        PhotonNetwork.LoadLevel("Level");
     }
 }
