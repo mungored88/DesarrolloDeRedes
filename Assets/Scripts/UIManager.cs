@@ -49,6 +49,7 @@ public class UIManager : MonoBehaviour
         wepHolder = _player.weaponHolder;
         ActiveGrenades = _player.ActiveGrenades;
 
+        if (!_player.photonView.IsMine) return;
         UpdateAmmoCount(ActiveWeapon.GetAmmo);
         UpdateGranadeCount(ActiveGrenades.grenadeHolder);
 

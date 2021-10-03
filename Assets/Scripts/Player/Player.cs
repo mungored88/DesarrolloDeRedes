@@ -50,7 +50,11 @@ public class Player : Entity , ICollector, IDamageable, IObservable
 
     private void Start()
     {
-        if (!photonView.IsMine) return;
+        if (!photonView.IsMine)
+        {
+            FindObjectOfType<Player>().gameObject.GetComponent<AudioListener>().enabled = false;
+            return;
+        }
         
         _control = new PlayerController(this);
         _animator = this.GetComponent<Animator>();

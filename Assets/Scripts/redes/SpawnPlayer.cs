@@ -4,7 +4,7 @@ using UnityEngine.UI;
 using TMPro;
 using Cinemachine;
 
-public class SpawnPlayer : MonoBehaviour
+public class SpawnPlayer : MonoBehaviourPun
 {
     public GameObject playerPrefab;
     public Transform parentTransform;
@@ -81,7 +81,7 @@ public class SpawnPlayer : MonoBehaviour
         playerUiM.boxfood=boxfood;
         playerUiM.winner=winner;
 
-        Debug.Log( PhotonNetwork.PlayerList.Length);
+        //Debug.Log( PhotonNetwork.PlayerList.Length);
     }
 
 }
