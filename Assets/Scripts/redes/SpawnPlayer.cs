@@ -7,8 +7,11 @@ using Cinemachine;
 public class SpawnPlayer : MonoBehaviour
 {
     public GameObject playerPrefab;
-    public Vector3 spawnPosition;
-    public Transform PlayerPos;
+    public Transform parentTransform;
+    //public Vector3 spawnPosition;
+    //public Transform PlayerPos;
+    public Transform player1Position;
+    public Transform player2Position;
 
     public Image[] Bull;
     public Sprite FullBull;
@@ -42,8 +45,17 @@ public class SpawnPlayer : MonoBehaviour
     UIManager playerUiM;
     private void Awake()
     {
+        Vector3 spawnPosition;
+        if (PhotonNetwork.IsMasterClient)
+        {
+            spawnPosition = player1Position.position;
+        }
+        else
+        {
+            spawnPosition = player2Position.position;
+        }
         GameObject playerGO = PhotonNetwork.Instantiate(playerPrefab.name, spawnPosition, Quaternion.identity);
-        playerGO.transform.parent = PlayerPos;
+        playerGO.transform.parent = parentTransform;
         playerUiM = playerGO.GetComponent<UIManager>();
         PlayerCam = FindObjectOfType<CinemachineFreeLook>();
         PlayerCam.Follow = playerGO.transform;
@@ -52,8 +64,6 @@ public class SpawnPlayer : MonoBehaviour
 
     void Start()
     {
-        
-
         playerUiM.Bull= Bull;
         playerUiM.FullBull=FullBull;
         playerUiM.EmptyBull=EmptyBull;

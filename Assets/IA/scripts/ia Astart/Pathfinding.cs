@@ -30,7 +30,7 @@ public class Pathfinding : MonoBehaviour
     {
         //Player.PlayerLost += RemovePlayerFromList;
         PlayerList = FindObjectsOfType<Player>().ToList();
-        GridReference = GetComponent<Grid>();
+        GridReference = FindObjectOfType<Grid>();
     }
 
 
