@@ -2,8 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
-public abstract class Weapon : MonoBehaviour , IInteractable, ICollectable<Weapon>
+public abstract class Weapon : MonoBehaviourPun , IInteractable, ICollectable<Weapon>
 
 {
     [Header("Sounds")]
@@ -66,20 +67,22 @@ public abstract class Weapon : MonoBehaviour , IInteractable, ICollectable<Weapo
 
         _weaponSoundMananger = new WeaponSoundMananger(this);
     }
-
-
-    public void GrabThis()
-    {
-        Collect(this);
-        HideWeapon();
-        _weaponSoundMananger.Grab();
-    }
-
-    private void HideWeapon()
+    
+    protected virtual void HideWeapon()
     {
         this.GetComponent<MeshRenderer>().enabled = false;
         this.GetComponent<SphereCollider>().enabled = false;
     }
+    
+    public virtual void GrabThis()
+    {
+        //photonView.RPC("HideWeapon", RpcTarget.AllViaServer);
+        Collect(this);
+        //HideWeapon();
+        _weaponSoundMananger.Grab();
+    }
+
+    
   
     public void ChangeFiringMode()
     {

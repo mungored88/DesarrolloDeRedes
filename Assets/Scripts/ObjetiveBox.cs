@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Photon.Pun;
 using UnityEngine;
 
-public class ObjetiveBox : MonoBehaviour, IInteractable
+public class ObjetiveBox : MonoBehaviourPun, IInteractable
 {
     public event Action OnGrab;
    

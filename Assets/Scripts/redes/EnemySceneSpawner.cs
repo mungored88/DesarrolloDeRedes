@@ -23,7 +23,6 @@ public class EnemySceneSpawner : MonoBehaviourPun
             GameObject enemy = PhotonNetwork.InstantiateRoomObject(enemyPrefab.name, 
                 spawnerTransform.position, Quaternion.identity);
             enemy.transform.parent = parentGameobject.transform;
-
         }
     }
 }
