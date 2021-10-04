@@ -69,10 +69,13 @@ public class Pathfinding : MonoBehaviour
                 }
             }
         }
-        catch (MissingReferenceException)
+        catch (Exception ex)
         {
-            PlayerList = FindObjectsOfType<Player>().ToList();
-            SetNearestPlayer();
+            if (ex is MissingReferenceException || ex is ArgumentOutOfRangeException)
+            {
+                PlayerList = FindObjectsOfType<Player>().ToList();
+                SetNearestPlayer();
+            }
         }
     }
 

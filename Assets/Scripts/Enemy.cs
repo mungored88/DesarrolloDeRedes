@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Photon.Pun;
 using UnityEngine;
 
 public class Enemy : Entity , IDamageable
@@ -13,6 +14,7 @@ public class Enemy : Entity , IDamageable
     public AudioSource attack;
     public AudioSource getHit;
 
+    [PunRPC]
     public void Die()
     {
         Destroy(this.gameObject);
@@ -23,7 +25,11 @@ public class Enemy : Entity , IDamageable
         getHit.Play();
 
         life -= dmg;
-        if (life <= 0) Die();
+        if (life <= 0)
+        {
+            photonView.RPC("Die", RpcTarget.AllViaServer);
+            //Die();
+        }
     }
 
     private void OnTriggerEnter(Collider other)
