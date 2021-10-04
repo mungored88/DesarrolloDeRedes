@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Photon.Pun;
 using UnityEngine;
 
 public class Pathfinding : MonoBehaviour
@@ -36,30 +37,42 @@ public class Pathfinding : MonoBehaviour
 
     private void Update()
     {
+        if (PlayerList.Count < 2)
+        {
+            PlayerList = FindObjectsOfType<Player>().ToList();
+        }
         // if the scene has no players, then do nothing
-        if (PlayerList.Count == 0) return;
+        if (PhotonNetwork.PlayerList.Length == 0) return;
         
         
         SetNearestPlayer();
         EnemyPath = FindPath(StartPosition.position, TargetPosition.position);
     }
-    private void  SetNearestPlayer()
+    private void SetNearestPlayer()
     {
-        if (PlayerList.Count == 1)
+        try
         {
-            TargetPosition = PlayerList[0].transform;
-        }
-        else
-        {
-            if (Vector3.Distance(transform.position, PlayerList[0].transform.position) < 
-                Vector3.Distance(transform.position, PlayerList[1].transform.position))
+            if (PhotonNetwork.PlayerList.Length == 1)
             {
                 TargetPosition = PlayerList[0].transform;
             }
             else
             {
-                TargetPosition = PlayerList[1].transform;
+                if (Vector3.Distance(transform.position, PlayerList[0].transform.position) <
+                    Vector3.Distance(transform.position, PlayerList[1].transform.position))
+                {
+                    TargetPosition = PlayerList[0].transform;
+                }
+                else
+                {
+                    TargetPosition = PlayerList[1].transform;
+                }
             }
+        }
+        catch (MissingReferenceException)
+        {
+            PlayerList = FindObjectsOfType<Player>().ToList();
+            SetNearestPlayer();
         }
     }
 

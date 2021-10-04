@@ -14,6 +14,8 @@ public class LobbyUI : MonoBehaviourPunCallbacks
         RoomOptions option = new RoomOptions();
 
         option.MaxPlayers = 2;
+        // so enemies are not destroyed when the master disconnects
+        // option.CleanupCacheOnLeave = false;
 
         PhotonNetwork.CreateRoom(createInputField.text, option);
     }
@@ -30,7 +32,6 @@ public class LobbyUI : MonoBehaviourPunCallbacks
 
     public void BtnJoinRoom()
     {
-        
         PhotonNetwork.JoinRoom(joinInputField.text);
     }
 
@@ -49,6 +50,7 @@ public class LobbyUI : MonoBehaviourPunCallbacks
 
     private IEnumerator StartGameAfterTwoPlayersConnect()
     {
+        // TODO: change to 2
         while (PhotonNetwork.PlayerList.Length < 2)
         {
             yield return new WaitForSeconds(0.15f);

@@ -43,6 +43,8 @@ public class Player : Entity , ICollector, IDamageable, IObservable
     public event Action<float> onUpdateLife;
     public event Action OnGrab;
 
+    public GameObject minimapGameObject;
+
 
     //Debug pourpuse
     public Transform CtSpawn;
@@ -52,7 +54,10 @@ public class Player : Entity , ICollector, IDamageable, IObservable
     {
         if (!photonView.IsMine)
         {
+            // Disable other audio listeners
             FindObjectOfType<Player>().gameObject.GetComponent<AudioListener>().enabled = false;
+            // disable other player's minimap
+            minimapGameObject.SetActive(false);
             return;
         }
         

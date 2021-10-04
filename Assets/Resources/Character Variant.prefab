@@ -354,6 +354,11 @@ PrefabInstance:
       propertyPath: activeWeapon
       value: 
       objectReference: {fileID: 6025289308829836464}
+    - target: {fileID: 3769900653508314634, guid: 74111b573bcc92b4f814ec095ccc6840,
+        type: 3}
+      propertyPath: minimapGameObject
+      value: 
+      objectReference: {fileID: 15694911888276346}
     - target: {fileID: 5399652180532912724, guid: 74111b573bcc92b4f814ec095ccc6840,
         type: 3}
       propertyPath: m_CastShadows
@@ -457,6 +462,12 @@ GameObject:
 --- !u!4 &1422215466410363120 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6441291040763461050, guid: 74111b573bcc92b4f814ec095ccc6840,
+    type: 3}
+  m_PrefabInstance: {fileID: 5393246906214806858}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &15694911888276346 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5399652181299809840, guid: 74111b573bcc92b4f814ec095ccc6840,
     type: 3}
   m_PrefabInstance: {fileID: 5393246906214806858}
   m_PrefabAsset: {fileID: 0}

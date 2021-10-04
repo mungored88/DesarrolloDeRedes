@@ -20,7 +20,7 @@ public class EnemySceneSpawner : MonoBehaviourPun
         spawnerPositions.RemoveAt(0);
         foreach (Transform spawnerTransform in spawnerPositions)
         {
-            GameObject enemy = PhotonNetwork.Instantiate(enemyPrefab.name, 
+            GameObject enemy = PhotonNetwork.InstantiateRoomObject(enemyPrefab.name, 
                 spawnerTransform.position, Quaternion.identity);
             enemy.transform.parent = parentGameobject.transform;
 
