@@ -4,8 +4,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System;
+using Photon.Pun;
+using UnityEngine.SceneManagement;
 
-public class UIManager : MonoBehaviour
+public class UIManager : MonoBehaviourPun
 {
 
     public Image[] Bull;
@@ -125,16 +127,23 @@ public class UIManager : MonoBehaviour
     }
     public void ObjetiveTextFood()
     {
-        morfi.fontStyle = FontStyles.Strikethrough;
-        ObjetiveCompleted();
+        //morfi.fontStyle = FontStyles.Strikethrough;
+        
+        photonView.RPC("ObjetiveCompleted", RpcTarget.AllViaServer);
+        //ObjetiveCompleted();
     }
+    
+    [PunRPC]
     public void ObjetiveCompleted()
     {
-        if(morfi.fontStyle == FontStyles.Strikethrough && medicina.fontStyle == FontStyles.Strikethrough)
-        {
-            volveBase.enabled = true;
-            winner.gameObject.SetActive(true);
-        }
+        // Let's win here!
+        SceneManager.LoadScene("win");
+        
+        //if(morfi.fontStyle == FontStyles.Strikethrough && medicina.fontStyle == FontStyles.Strikethrough)
+        //{
+        //    volveBase.enabled = true;
+        //    winner.gameObject.SetActive(true);
+        //}
     }
        
 }

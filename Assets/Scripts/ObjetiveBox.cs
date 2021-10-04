@@ -7,7 +7,7 @@ using UnityEngine;
 public class ObjetiveBox : MonoBehaviourPun, IInteractable
 {
     public event Action OnGrab;
-   
+    
     // Update is called once per frame
     void Update()
     {
@@ -15,9 +15,17 @@ public class ObjetiveBox : MonoBehaviourPun, IInteractable
     }
     private void OnTriggerEnter(Collider _player)
     {
-        OnGrab();
+        //OnGrab();
+        FindObjectOfType<UIManager>().ObjetiveTextFood();
         this.GetComponent<AudioSource>().Play();
         this.GetComponentInChildren<SkinnedMeshRenderer>().enabled = false;
-        Destroy(this.gameObject,2);
+        photonView.RPC("DestroyBox", RpcTarget.AllViaServer);
+        //Destroy(this.gameObject,2);
+    }
+
+    [PunRPC]
+    private void DestroyBox()
+    {
+        Destroy(gameObject, 2);
     }
 }
