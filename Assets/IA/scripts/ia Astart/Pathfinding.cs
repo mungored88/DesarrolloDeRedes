@@ -46,7 +46,14 @@ public class Pathfinding : MonoBehaviour
         
         
         SetNearestPlayer();
-        EnemyPath = FindPath(StartPosition.position, TargetPosition.position);
+        try
+        {
+            EnemyPath = FindPath(StartPosition.position, TargetPosition.position);
+        }
+        catch (NullReferenceException)
+        {
+            // Do nothing. Skip to the next frame update
+        }
     }
     private void SetNearestPlayer()
     {
@@ -74,7 +81,7 @@ public class Pathfinding : MonoBehaviour
             if (ex is MissingReferenceException || ex is ArgumentOutOfRangeException)
             {
                 PlayerList = FindObjectsOfType<Player>().ToList();
-                SetNearestPlayer();
+                //SetNearestPlayer();
             }
         }
     }

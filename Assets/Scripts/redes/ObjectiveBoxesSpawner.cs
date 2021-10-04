@@ -13,7 +13,7 @@ namespace redes
 
         private UIManager _uiManager;
         
-        private void Awake()
+        private void Start()
         {
             _uiManager = FindObjectOfType<UIManager>();
             // si no soy el primer cliente conectado, no quiero crear enemigos
