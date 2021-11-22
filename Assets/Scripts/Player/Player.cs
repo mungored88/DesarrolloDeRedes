@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Photon.Pun;
+using redes.parcial_2;
 using UnityEngine;
 
 public class Player : Entity , ICollector, IDamageable, IObservable
 {
+    private Photon.Realtime.Player _owner; // El "ID" para saber a quien representa este Model
+    
     [Header("Movement")]
     public float speed;
     public bool isGrounded;
@@ -81,7 +85,6 @@ public class Player : Entity , ICollector, IDamageable, IObservable
         _battleMechanics = new BattleMechanics(this, activeWeapon, weaponHolder, grenades);
 
         weaponHolder.onUpdateWeapon += updateChangeWeapon;
-
     }
 
 
@@ -135,8 +138,9 @@ public class Player : Entity , ICollector, IDamageable, IObservable
     }
     internal void Move(float v, float h)
     {
+        FAServer.Instance.RequestMove(_owner, v, h);
+        //_movement.Move(v, h);
         // TODO: Server
-        _movement.Move(v, h);
         _playerView.animator.Move(h,v);
     }
     internal void Roll()

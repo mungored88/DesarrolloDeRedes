@@ -9,12 +9,15 @@ using redes.parcial_2;
 public class Launcher : MonoBehaviourPunCallbacks
 {
     public FAServer serverPrefab;
-    public ControllerFA controllerPrefab;
+    
+    // ControllerFA == PlayerController (NO es un monobehavior)
+    // public ControllerFA controllerPrefab;
+    
     public GameObject mainScreen, connectedScreen;
 
     private void Start()
     {
-        Cursor.lockState = CursorLockMode.Confined;
+        // Cursor.lockState = CursorLockMode.Confined;
         Cursor.visible = true;
     }
 
@@ -39,6 +42,7 @@ public class Launcher : MonoBehaviourPunCallbacks
     
     public override void OnCreatedRoom()
     {
+        Debug.Log("--- OnCreatedRoom: Instantiate Server");
         PhotonNetwork.Instantiate(serverPrefab.name, Vector3.zero, Quaternion.identity);
     }
     
@@ -46,7 +50,8 @@ public class Launcher : MonoBehaviourPunCallbacks
     {
         if (!PhotonNetwork.IsMasterClient)
         {
-            PhotonNetwork.Instantiate(controllerPrefab.name, Vector3.zero, Quaternion.identity);
+            // no hace falta, porque lo controla PlayerController
+            //PhotonNetwork.Instantiate(controllerPrefab.name, Vector3.zero, Quaternion.identity);
         }
     }
 

@@ -2039,6 +2039,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0926e172409ce554093f324820b4f9f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  serverPrefab: {fileID: 8771315322713023458, guid: 79f587444d9278c4ca046056de1d376e,
+    type: 3}
   mainScreen: {fileID: 1350621261}
   connectedScreen: {fileID: 1803121893}
 --- !u!4 &1824575563

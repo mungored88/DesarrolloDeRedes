@@ -43,6 +43,10 @@ MonoBehaviour:
   - HideWeapon
   - DestroyBox
   - ObjetiveCompleted
+  - AddPlayer
+  - SetServer
+  - Move
+  - Shoot
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

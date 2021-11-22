@@ -10,6 +10,6 @@ public class MyCamera : MonoBehaviour
 
     protected virtual void Start()
     {
-        Cursor.lockState = CursorLockMode.Locked; //Me permite hacer que el mouse no se mueva del centro de la pantalla
+        // Cursor.lockState = CursorLockMode.Locked; //Me permite hacer que el mouse no se mueva del centro de la pantalla
     }
 }

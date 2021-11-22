@@ -66,6 +66,12 @@ namespace redes.parcial_2
 
         IEnumerator WaitForLevel(Photon.Realtime.Player player)
         {
+            Debug.Log("Waiting for level.... ");
+            while (PhotonNetwork.PlayerList.Length < 2)
+            {
+                yield return new WaitForSeconds(0.15f);
+            }
+            
             while (PhotonNetwork.LevelLoadingProgress > 0.9f)
             {
                 yield return new WaitForEndOfFrame();
@@ -75,18 +81,24 @@ namespace redes.parcial_2
                 .Instantiate(characterPrefab.name, Vector3.zero, Quaternion.identity)
                 .GetComponent<Player>();
                 //.SetInitialParameters(player);
+            
+            Debug.Log("--- WaitForLevel: Instantiated Player");
             _dicModels.Add(player, newCharacter);
             
             // _dicViews.Add(player, newCharacter.GetComponent<CharacterViewFA>());
+        }
+        
+        public Photon.Realtime.Player getPlayerServer()
+        {
+            return _server;
         }
 
         /* REQUESTS (SERVERS AVATARES)*/
 
         //Esto lo recibe del Controller y llama por RPC a la funcion MOVE del host real
-
-        public void RequestMove(Photon.Realtime.Player player, Vector3 dir)
+        public void RequestMove(Photon.Realtime.Player player, float v, float h)
         {
-            photonView.RPC("Move", _server, player, dir);
+            photonView.RPC("Move", _server, player, v, h);
         }
 
         public void RequestShoot(Photon.Realtime.Player player)
@@ -97,12 +109,12 @@ namespace redes.parcial_2
         
         /* Requests que recibe el SERVER para gestionar a los jugadores */
         [PunRPC]
-        void Move(Photon.Realtime.Player player, Vector3 dir)
+        void Move(Photon.Realtime.Player player, float v, float h)
         {
             if (_dicModels.ContainsKey(player))
             {
                 Debug.Log("Server moves player...");
-                //_dicModels[player].Move(dir);
+                _dicModels[player].Move(v, h);
             }
         }
 

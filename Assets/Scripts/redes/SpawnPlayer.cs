@@ -3,6 +3,7 @@ using Photon.Pun;
 using UnityEngine.UI;
 using TMPro;
 using Cinemachine;
+using redes.parcial_2;
 
 public class SpawnPlayer : MonoBehaviourPun
 {
@@ -46,6 +47,16 @@ public class SpawnPlayer : MonoBehaviourPun
     private void Awake()
     {
         Vector3 spawnPosition;
+        var playerLocal = PhotonNetwork.LocalPlayer;
+
+        if (Equals(FAServer.Instance.getPlayerServer(), playerLocal))
+        {
+            // soy el server
+            Debug.Log("--- Soy el server. No creo un Player para mi mismo");
+            return;
+        }
+
+        // TODO: hacer los player por indice
         if (PhotonNetwork.IsMasterClient)
         {
             spawnPosition = player1Position.position;
@@ -64,6 +75,14 @@ public class SpawnPlayer : MonoBehaviourPun
 
     void Start()
     {
+        var playerLocal = PhotonNetwork.LocalPlayer;
+        if (Equals(FAServer.Instance.getPlayerServer(), playerLocal))
+        {
+            // soy el server
+            Debug.Log("--- Soy el server. Salgo del Start");
+            return;
+        }
+        
         playerUiM.Bull= Bull;
         playerUiM.FullBull=FullBull;
         playerUiM.EmptyBull=EmptyBull;

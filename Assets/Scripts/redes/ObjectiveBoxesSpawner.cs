@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Photon.Pun;
+using redes.parcial_2;
 using UnityEngine;
 
 namespace redes
@@ -15,30 +16,28 @@ namespace redes
         
         private void Start()
         {
+            // _uiManager es un componente de los jugadores. So no existe, no hacemos nada
             _uiManager = FindObjectOfType<UIManager>();
             // si no soy el primer cliente conectado, no quiero crear enemigos
-            if (!PhotonNetwork.IsMasterClient) return;
-
-            for (int i = 0; i < spawnerPositions.Count; i++)
+            var playerLocal = PhotonNetwork.LocalPlayer;
+            
+            // No quiero spawnear los objetos?
+            if (!Equals(FAServer.Instance.getPlayerServer(), playerLocal))
             {
-                GameObject newBoxesGO = PhotonNetwork.InstantiateRoomObject(
-                    boxesPrefabs[i].name, 
-                    spawnerPositions[i].position, Quaternion.identity);
-                newBoxesGO.SetActive(true);
-                newBoxesGO.transform.parent = parentGameobject.transform;
-                // Set the medicine and food gameobjects in the UI manager
-                if (i == 0)
+                _uiManager.boxfood = FindObjectOfType<ObjetiveBox>();
+                _uiManager.boxfood.OnGrab += _uiManager.ObjetiveTextFood;
+                return;
+            }
+            else
+            {
+                for (int i = 0; i < spawnerPositions.Count; i++)
                 {
-                    // seteo food
-                    _uiManager.boxfood = newBoxesGO.GetComponent<ObjetiveBox>();
-                    _uiManager.boxfood.OnGrab += _uiManager.ObjetiveTextFood;
+                    GameObject newBoxesGO = PhotonNetwork.InstantiateRoomObject(
+                        boxesPrefabs[i].name, 
+                        spawnerPositions[i].position, Quaternion.identity);
+                    newBoxesGO.SetActive(true);
+                    newBoxesGO.transform.parent = parentGameobject.transform;
                 }
-                //if (i == 1)
-                //{
-                //    // seteo medicine
-                //    _uiManager.boxmedicine = newBoxesGO.GetComponent<ObjetiveBox>();
-                //    _uiManager.boxmedicine.OnGrab += _uiManager.ObjetiveTextMedicine;
-                //}
             }
         }
     }

@@ -54,6 +54,10 @@ public class Pathfinding : MonoBehaviour
         {
             // Do nothing. Skip to the next frame update
         }
+        catch (UnassignedReferenceException)
+        {
+            // Do nothing. Skip to the next frame update
+        }
     }
     private void SetNearestPlayer()
     {
@@ -65,6 +69,7 @@ public class Pathfinding : MonoBehaviour
             }
             else
             {
+                // TODO: mejorar la seleccion del Target
                 if (Vector3.Distance(transform.position, PlayerList[0].transform.position) <
                     Vector3.Distance(transform.position, PlayerList[1].transform.position))
                 {
@@ -72,7 +77,15 @@ public class Pathfinding : MonoBehaviour
                 }
                 else
                 {
-                    TargetPosition = PlayerList[1].transform;
+                    if (Vector3.Distance(transform.position, PlayerList[1].transform.position) <
+                        Vector3.Distance(transform.position, PlayerList[2].transform.position))
+                    {
+                        TargetPosition = PlayerList[1].transform;
+                    }
+                    else
+                    {
+                        TargetPosition = PlayerList[2].transform;
+                    }
                 }
             }
         }
