@@ -4,9 +4,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
+using redes.parcial_2;
 
 public class Launcher : MonoBehaviourPunCallbacks
 {
+    public FAServer serverPrefab;
+    public ControllerFA controllerPrefab;
     public GameObject mainScreen, connectedScreen;
 
     private void Start()
@@ -22,13 +25,29 @@ public class Launcher : MonoBehaviourPunCallbacks
 
     public override void OnConnectedToMaster()
     {
-        PhotonNetwork.JoinLobby(); //Estando en el Master Server, nos conectamos al lobby donde estan las rooms
+        RoomOptions options = new RoomOptions();
+        options.MaxPlayers = 4;
+
+        PhotonNetwork.JoinOrCreateRoom("MMsalaFullAuth", options, TypedLobby.Default);
     }
 
-    public override void OnJoinedLobby()
+    //public override void OnJoinedLobby()
+    //{
+    //    mainScreen.SetActive(false);
+    //    connectedScreen.SetActive(true);
+    //}
+    
+    public override void OnCreatedRoom()
     {
-        mainScreen.SetActive(false);
-        connectedScreen.SetActive(true);
+        PhotonNetwork.Instantiate(serverPrefab.name, Vector3.zero, Quaternion.identity);
+    }
+    
+    public override void OnJoinedRoom()
+    {
+        if (!PhotonNetwork.IsMasterClient)
+        {
+            PhotonNetwork.Instantiate(controllerPrefab.name, Vector3.zero, Quaternion.identity);
+        }
     }
 
     public override void OnDisconnected(DisconnectCause cause)

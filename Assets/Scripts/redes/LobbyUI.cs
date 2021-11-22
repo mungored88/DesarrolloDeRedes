@@ -4,9 +4,11 @@ using UnityEngine;
 using UnityEngine.UI;
 using Photon.Pun;
 using Photon.Realtime;
+using redes.parcial_2;
 
 public class LobbyUI : MonoBehaviourPunCallbacks
 {
+    // Parcial 2: Esta clase ya no se llama
     public InputField createInputField, joinInputField;
 
     public void BtnCreateRoom()

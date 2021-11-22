@@ -101,6 +101,7 @@ public class Player : Entity , ICollector, IDamageable, IObservable
     #region LIFE_STUFF
     public void GetDamage(float dmg)
     {
+        // TODO: Server
         life -= dmg;
         onUpdateLife(life);
 
@@ -109,6 +110,7 @@ public class Player : Entity , ICollector, IDamageable, IObservable
     
     public void Die()
     {
+        // TODO: Server
         if (PlayerLost != null) PlayerLost(this);
 
         _playerView.animator.Die();
@@ -133,11 +135,13 @@ public class Player : Entity , ICollector, IDamageable, IObservable
     }
     internal void Move(float v, float h)
     {
+        // TODO: Server
         _movement.Move(v, h);
         _playerView.animator.Move(h,v);
     }
     internal void Roll()
     {
+        // TODO: Server
         _movement.Roll();
         _playerView.animator.Roll();
     }
@@ -183,12 +187,14 @@ public class Player : Entity , ICollector, IDamageable, IObservable
 
     void updateChangeWeapon(Weapon wep)
     {
+        // TODO: Server
         this.activeWeapon = wep;
         _battleMechanics.setWeapon = wep;
     }
 
     public void GrabWeapon(Weapon weapon)
     {
+        // TODO: Server ?
         weaponHolder.AddWeapon(weapon);
         if (weapon.IsPrimary) ChangeWeapon(1);
         else if (!weapon.IsPrimary) ChangeWeapon(2);
@@ -218,6 +224,7 @@ public class Player : Entity , ICollector, IDamageable, IObservable
     }
     internal void launchGranade()
     {
+        // TODO: Server
         _battleMechanics.launchGranade();
     }
 
