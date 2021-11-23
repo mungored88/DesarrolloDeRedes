@@ -43,8 +43,8 @@ public class SpawnPlayer : MonoBehaviourPun
     public wincond winner;
 
     CinemachineFreeLook PlayerCam;
-    UIManager playerUiM;
-    private void Awake()
+    // UIManager playerUiM;
+    private void DeactivatedAwake()
     {
         Vector3 spawnPosition;
         var playerLocal = PhotonNetwork.LocalPlayer;
@@ -56,7 +56,7 @@ public class SpawnPlayer : MonoBehaviourPun
             return;
         }
 
-        // TODO: hacer los player por indice
+        // TODO: es el server el que tiene que crear los players
         if (PhotonNetwork.IsMasterClient)
         {
             spawnPosition = player1Position.position;
@@ -67,22 +67,14 @@ public class SpawnPlayer : MonoBehaviourPun
         }
         GameObject playerGO = PhotonNetwork.Instantiate(playerPrefab.name, spawnPosition, Quaternion.identity);
         playerGO.transform.parent = parentTransform;
-        playerUiM = playerGO.GetComponent<UIManager>();
-        PlayerCam = FindObjectOfType<CinemachineFreeLook>();
-        PlayerCam.Follow = playerGO.transform;
-        PlayerCam.LookAt = playerGO.transform;
+        // playerUiM = playerGO.GetComponent<UIManager>();
+        // PlayerCam = FindObjectOfType<CinemachineFreeLook>();
+        // PlayerCam.Follow = playerGO.transform;
+        // PlayerCam.LookAt = playerGO.transform;
     }
 
-    void Start()
+    public void SetupUIForPlayer(UIManager playerUiM)
     {
-        var playerLocal = PhotonNetwork.LocalPlayer;
-        if (Equals(FAServer.Instance.getPlayerServer(), playerLocal))
-        {
-            // soy el server
-            Debug.Log("--- Soy el server. Salgo del Start");
-            return;
-        }
-        
         playerUiM.Bull= Bull;
         playerUiM.FullBull=FullBull;
         playerUiM.EmptyBull=EmptyBull;
@@ -99,6 +91,34 @@ public class SpawnPlayer : MonoBehaviourPun
         playerUiM.boxmedicine=boxmedicine;
         playerUiM.boxfood=boxfood;
         playerUiM.winner=winner;
+    }
+
+    void DeactivatedStart()
+    {
+        var playerLocal = PhotonNetwork.LocalPlayer;
+        if (Equals(FAServer.Instance.getPlayerServer(), playerLocal))
+        {
+            // soy el server
+            Debug.Log("--- Soy el server. Salgo del Start");
+            return;
+        }
+        
+        // playerUiM.Bull= Bull;
+        // playerUiM.FullBull=FullBull;
+        // playerUiM.EmptyBull=EmptyBull;
+        // playerUiM.life=life;
+        // playerUiM.ammo=ammo;
+        // playerUiM.MaxAmmo=MaxAmmo;
+        // playerUiM.Granade=Granade;
+        // playerUiM.medicina=medicina;
+        // playerUiM.morfi=morfi;
+        // playerUiM.volveBase=volveBase;
+        // playerUiM.Weapons=Weapons;
+        // playerUiM.Slots=Slots;
+        // playerUiM.Selected=Selected;
+        // playerUiM.boxmedicine=boxmedicine;
+        // playerUiM.boxfood=boxfood;
+        // playerUiM.winner=winner;
 
         //Debug.Log( PhotonNetwork.PlayerList.Length);
     }

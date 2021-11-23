@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Cinemachine;
 using Photon.Pun;
 using redes.parcial_2;
 using UnityEngine;
@@ -100,6 +101,31 @@ public class Player : Entity , ICollector, IDamageable, IObservable
         if (Input.GetKeyDown(KeyCode.B)) { GetDamage(25); }
     }
 
+    UIManager playerUiM;
+    public Player SetInitialParameters(Photon.Realtime.Player localPlayer)
+    {
+        _owner = localPlayer;
+        
+        // le mando al player un RPC para que setee sus parametros
+        photonView.RPC("SetPlayerLocalParams", localPlayer);
+        
+        return this;
+    }
+
+    [PunRPC]
+    private void SetPlayerLocalParams()
+    {
+        Debug.Log("--- Esto corre en cada player, no en el server");
+        var spawnPlayer = FindObjectOfType<SpawnPlayer>();
+        transform.parent = spawnPlayer.parentTransform;
+        playerUiM = GetComponent<UIManager>();
+        var PlayerCam = FindObjectOfType<CinemachineFreeLook>();
+        PlayerCam.Follow = transform;
+        PlayerCam.LookAt = transform;
+        
+        spawnPlayer.SetupUIForPlayer(playerUiM);
+    }
+
 
     #region LIFE_STUFF
     public void GetDamage(float dmg)
@@ -138,8 +164,10 @@ public class Player : Entity , ICollector, IDamageable, IObservable
     }
     internal void Move(float v, float h)
     {
-        FAServer.Instance.RequestMove(_owner, v, h);
-        //_movement.Move(v, h);
+        // TODO: al move lo esta llamando el server, y no cada player
+        Debug.Log($"la llama {_owner.UserId}");
+        //FAServer.Instance.RequestMove(_owner, v, h);
+        _movement.Move(v, h);
         // TODO: Server
         _playerView.animator.Move(h,v);
     }

@@ -47,6 +47,7 @@ MonoBehaviour:
   - SetServer
   - Move
   - Shoot
+  - SetPlayerLocalParams
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

@@ -36,6 +36,7 @@ namespace redes.parcial_2
         [PunRPC]
         void SetServer(Photon.Realtime.Player serverPlayer, int sceneIndex = 1)
         {
+            Debug.Log("--- SetServer: lo llama cada player");
             if (Instance)
             {
                 Destroy(this.gameObject);
@@ -67,20 +68,26 @@ namespace redes.parcial_2
         IEnumerator WaitForLevel(Photon.Realtime.Player player)
         {
             Debug.Log("Waiting for level.... ");
-            while (PhotonNetwork.PlayerList.Length < 2)
-            {
-                yield return new WaitForSeconds(0.15f);
-            }
+            // while (PhotonNetwork.PlayerList.Length < 2)
+            // {
+            //     yield return new WaitForSeconds(0.15f);
+            // }
             
             while (PhotonNetwork.LevelLoadingProgress > 0.9f)
             {
                 yield return new WaitForEndOfFrame();
             }
 
+            // TODO: una pos por cada player
+            var spawnPos = FindObjectOfType<SpawnPlayer>();
+            Transform p1Position = spawnPos.player1Position;
+
+            // El nivel esta cargado en este punto
+            // TODO: crear players de acuerdo a la cant de PlayerList
             Player newCharacter = PhotonNetwork
-                .Instantiate(characterPrefab.name, Vector3.zero, Quaternion.identity)
-                .GetComponent<Player>();
-                //.SetInitialParameters(player);
+                .Instantiate(characterPrefab.name, p1Position.position, Quaternion.identity)
+                .GetComponent<Player>()
+                .SetInitialParameters(player);
             
             Debug.Log("--- WaitForLevel: Instantiated Player");
             _dicModels.Add(player, newCharacter);
