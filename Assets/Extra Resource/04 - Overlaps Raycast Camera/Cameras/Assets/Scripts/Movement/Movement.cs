@@ -35,12 +35,19 @@ public class Movement
         _rb = _player.GetComponent<Rigidbody>();
         _speed = _player.speed;
 
+        if (c != null)
+        {
+            SetCam(c);
+        }
+    }
+
+    public void SetCam(Camera c)
+    {
         _cam = c.transform;
         _cameraForward = new Vector3(_cam.forward.x, _player.transform.forward.y, _cam.forward.z);
         _cameraRight = new Vector3(_cam.right.x, _player.transform.forward.y, _cam.right.z);
-
+        
         Awake();
-
     }
 
     public void ChangeMovementMode(MovementMode tipo)

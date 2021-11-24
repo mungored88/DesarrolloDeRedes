@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using TMPro;
 using System;
 using Photon.Pun;
+using redes.parcial_2;
 using UnityEngine.SceneManagement;
 
 public class UIManager : MonoBehaviourPun
@@ -42,21 +43,18 @@ public class UIManager : MonoBehaviourPun
 
     public wincond winner;
 
-
-    private void Start()
+    public void SetUIManagerForClient(Player player)
     {
+        ActiveWeapon = player.ActiveWeapon;
+        wepHolder = player.weaponHolder;
+        ActiveGrenades = player.ActiveGrenades;
         
-        _player = this.GetComponent<Player>();
-        ActiveWeapon = _player.ActiveWeapon;
-        wepHolder = _player.weaponHolder;
-        ActiveGrenades = _player.ActiveGrenades;
-
-        if (!_player.photonView.IsMine) return;
+        // TODO: Server should not set any of this
         UpdateAmmoCount(ActiveWeapon.GetAmmo);
         UpdateGranadeCount(ActiveGrenades.grenadeHolder);
 
 
-        _player.onUpdateLife += LifeUpdate;
+        player.onUpdateLife += LifeUpdate;
         ActiveWeapon.onUpdateAmmo += UpdateAmmoCount;
         wepHolder.onUpdateWeapon += WeaponChanged;
         wepHolder.onUpdateWeapon += SelectWeaponSlot;
@@ -65,8 +63,6 @@ public class UIManager : MonoBehaviourPun
 
         boxmedicine.OnGrab += ObjetiveTextMedicine;
         boxfood.OnGrab += ObjetiveTextFood;
-
-      
     }
 
     public void UpdateAmmoCount(Ammo ammo)

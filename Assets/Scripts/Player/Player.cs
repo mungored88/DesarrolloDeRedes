@@ -3,12 +3,16 @@ using System.Collections;
 using System.Collections.Generic;
 using Cinemachine;
 using Photon.Pun;
+using redes;
 using redes.parcial_2;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.Experimental.PlayerLoop;
 
 public class Player : Entity , ICollector, IDamageable, IObservable
 {
     private Photon.Realtime.Player _owner; // El "ID" para saber a quien representa este Model
+    private Photon.Realtime.Player _serverReference; // referencia al servidor (a quien enviarle requests)
     
     [Header("Movement")]
     public float speed;
@@ -57,6 +61,7 @@ public class Player : Entity , ICollector, IDamageable, IObservable
 
     private void Start()
     {
+        // No va mas isMine, porque "son todos del server"
         if (!photonView.IsMine)
         {
             // Disable other audio listeners
@@ -65,65 +70,90 @@ public class Player : Entity , ICollector, IDamageable, IObservable
             minimapGameObject.SetActive(false);
             return;
         }
-        
-        _control = new PlayerController(this);
-        _animator = this.GetComponent<Animator>();
+    }
 
-        cam = Camera.main;
-        _soundMananger = new SoundMananger();
-        _animatorController = new AnimatorController(_animator);
-        _playerView = new PlayerView(this, _animatorController, _soundMananger);
-        _movement = new Movement(this, cam);
-
-        activeWeapon.BulletOrigin = bulletOrigin;
-        activeWeapon.BulletOriginBucket = bulletOriginBucket;
-        grenades = new GrenadeHolder().setSpawnPos(grenadeOrigin).setPlayerRb(this.GetComponent<Rigidbody>());
-
-        weaponHolder = new WeaponHolder(this);
-
-        weaponHolder.AddWeapon(activeWeapon);
-
-        _battleMechanics = new BattleMechanics(this, activeWeapon, weaponHolder, grenades);
-
-        weaponHolder.onUpdateWeapon += updateChangeWeapon;
+    public Photon.Realtime.Player GetServerReference()
+    {
+        return _serverReference;
     }
 
 
+    // ya no voy a tener mas Update, porque me va a controlar el server....
+    public delegate void ControlDelegate();
+    private ControlDelegate _controlDelegate = () => { };
+
     void Update()
     {
-        if (!photonView.IsMine) return;
-        
-        _control.OnUpdate();
-
+        // TODO: solo lo tiene que hacer cada cliente
+        _controlDelegate.Invoke();
         //FORDEBUG
         //if (Input.GetKeyDown(KeyCode.F1)) { this.transform.position = CtSpawn.position; }
         //if (Input.GetKeyDown(KeyCode.F2)) { this.transform.position = MafiaSpawn.position; }  
-        if (Input.GetKeyDown(KeyCode.B)) { GetDamage(25); }
+        // if (Input.GetKeyDown(KeyCode.B)) { GetDamage(25); }
+    }
+
+    public Photon.Realtime.Player GetOwner()
+    {
+        return _owner;
     }
 
     UIManager playerUiM;
     public Player SetInitialParameters(Photon.Realtime.Player localPlayer)
     {
+        // owner es el current player
         _owner = localPlayer;
+        _movement = new Movement(this, cam);
         
         // le mando al player un RPC para que setee sus parametros
-        photonView.RPC("SetPlayerLocalParams", localPlayer);
+        photonView.RPC("SetPlayerLocalParams", localPlayer, _owner, _movement);
         
         return this;
     }
 
     [PunRPC]
-    private void SetPlayerLocalParams()
+    private void SetPlayerLocalParams(Photon.Realtime.Player localPlayer, Movement movement)
     {
-        Debug.Log("--- Esto corre en cada player, no en el server");
+        _owner = localPlayer;
+        Debug.Log("--- [Client] player setea sus propios parametros");
+        
+        // Awake
+        _control = new PlayerController(this);
+        _animator = this.GetComponent<Animator>();
+        cam = Camera.main;
+        _soundMananger = new SoundMananger();
+        _animatorController = new AnimatorController(_animator);
+        _playerView = new PlayerView(this, _animatorController, _soundMananger);
+        _movement = movement;
+        _movement.SetCam(cam);
+        // ------------
+
+        // Start
         var spawnPlayer = FindObjectOfType<SpawnPlayer>();
         transform.parent = spawnPlayer.parentTransform;
-        playerUiM = GetComponent<UIManager>();
+
         var PlayerCam = FindObjectOfType<CinemachineFreeLook>();
         PlayerCam.Follow = transform;
         PlayerCam.LookAt = transform;
         
+        // Setea la UI de los objetivos
+        playerUiM = GetComponent<UIManager>();
+
+        // Hacemos lo que antes hacia el Start
+        activeWeapon.BulletOrigin = bulletOrigin;
+        activeWeapon.BulletOriginBucket = bulletOriginBucket;
+        grenades = new GrenadeHolder().setSpawnPos(grenadeOrigin).setPlayerRb(this.GetComponent<Rigidbody>());
+        weaponHolder = new WeaponHolder(this);
+        weaponHolder.AddWeapon(activeWeapon);
+        _battleMechanics = new BattleMechanics(this, activeWeapon, weaponHolder, grenades);
+        weaponHolder.onUpdateWeapon += updateChangeWeapon;
+        
         spawnPlayer.SetupUIForPlayer(playerUiM);
+        playerUiM.SetUIManagerForClient(this);
+        FindObjectOfType<ObjectiveBoxesSpawner>().ClientSetupObjectiveBoxes(playerUiM);
+        // ------
+
+        // hack para no llamar al OnUpdate en Update (y que se ejecute en todos los players)
+        _controlDelegate += _control.OnUpdate;
     }
 
 
@@ -162,14 +192,13 @@ public class Player : Entity , ICollector, IDamageable, IObservable
     {
         _movement.Aim();
     }
-    internal void Move(float v, float h)
+    internal void PlayerMove(float v, float h)
     {
-        // TODO: al move lo esta llamando el server, y no cada player
-        Debug.Log($"la llama {_owner.UserId}");
-        //FAServer.Instance.RequestMove(_owner, v, h);
+        // TODO: Exception: Write failed. Custom type not found: Movement
         _movement.Move(v, h);
+        
         // TODO: Server
-        _playerView.animator.Move(h,v);
+        //_playerView.animator.Move(h,v);
     }
     internal void Roll()
     {

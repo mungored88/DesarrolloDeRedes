@@ -32,11 +32,16 @@ namespace redes.parcial_2
                 }
             }
         }
+        
+        public Photon.Realtime.Player getPlayerServer()
+        {
+            return _server;
+        }
 
         [PunRPC]
         void SetServer(Photon.Realtime.Player serverPlayer, int sceneIndex = 1)
         {
-            Debug.Log("--- SetServer: lo llama cada player");
+            Debug.Log("--- [Client] SetServer: lo llama cada player");
             if (Instance)
             {
                 Destroy(this.gameObject);
@@ -62,12 +67,14 @@ namespace redes.parcial_2
         [PunRPC]
         void AddPlayer(Photon.Realtime.Player player)
         {
+            Debug.Log("--- [Server] Agrego al player a la lista de players");
             StartCoroutine(WaitForLevel(player));
         }
 
         IEnumerator WaitForLevel(Photon.Realtime.Player player)
         {
-            Debug.Log("Waiting for level.... ");
+            // TODO: iniciar cuando hayan 3 players conectados
+            Debug.Log("[Server] Waiting for level.... ");
             // while (PhotonNetwork.PlayerList.Length < 2)
             // {
             //     yield return new WaitForSeconds(0.15f);
@@ -89,15 +96,10 @@ namespace redes.parcial_2
                 .GetComponent<Player>()
                 .SetInitialParameters(player);
             
-            Debug.Log("--- WaitForLevel: Instantiated Player");
+            Debug.Log($"--- [Server] Player {newCharacter.name} instanciado");
             _dicModels.Add(player, newCharacter);
-            
+
             // _dicViews.Add(player, newCharacter.GetComponent<CharacterViewFA>());
-        }
-        
-        public Photon.Realtime.Player getPlayerServer()
-        {
-            return _server;
         }
 
         /* REQUESTS (SERVERS AVATARES)*/
@@ -120,8 +122,8 @@ namespace redes.parcial_2
         {
             if (_dicModels.ContainsKey(player))
             {
-                Debug.Log("Server moves player...");
-                _dicModels[player].Move(v, h);
+                Debug.Log("[Server] Server moves player...");
+                _dicModels[player].PlayerMove(v, h);
             }
         }
 
