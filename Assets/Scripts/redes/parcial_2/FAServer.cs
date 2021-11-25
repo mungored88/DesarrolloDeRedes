@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using ExitGames.Client.Photon;
 using Photon.Pun;
 using UnityEngine;
 
@@ -14,7 +15,7 @@ namespace redes.parcial_2
         public Player characterPrefab; //Prefab del Model a instanciar cuando se conecte un jugador
 
         Dictionary<Photon.Realtime.Player, Player> _dicModels = new Dictionary<Photon.Realtime.Player, Player>();
-        
+
         // Animations? lo necesitamos?
         // Dictionary<Photon.Realtime.Player, CharacterViewFA> _dicViews = new Dictionary<Photon.Realtime.Player, CharacterViewFA>();
 
@@ -32,7 +33,7 @@ namespace redes.parcial_2
                 }
             }
         }
-        
+
         public Photon.Realtime.Player getPlayerServer()
         {
             return _server;
@@ -79,7 +80,7 @@ namespace redes.parcial_2
             // {
             //     yield return new WaitForSeconds(0.15f);
             // }
-            
+
             while (PhotonNetwork.LevelLoadingProgress > 0.9f)
             {
                 yield return new WaitForEndOfFrame();
@@ -95,7 +96,7 @@ namespace redes.parcial_2
                 .Instantiate(characterPrefab.name, p1Position.position, Quaternion.identity)
                 .GetComponent<Player>()
                 .SetInitialParameters(player);
-            
+
             Debug.Log($"--- [Server] Player {newCharacter.name} instanciado");
             _dicModels.Add(player, newCharacter);
 
@@ -105,25 +106,41 @@ namespace redes.parcial_2
         /* REQUESTS (SERVERS AVATARES)*/
 
         //Esto lo recibe del Controller y llama por RPC a la funcion MOVE del host real
-        public void RequestMove(Photon.Realtime.Player player, float v, float h)
+        public void RequestMove(Photon.Realtime.Player player, float v, float h, Vector3 cameraForward,
+            Vector3 cameraRight)
         {
-            photonView.RPC("Move", _server, player, v, h);
+            float camForwardX = cameraForward.x;
+            float camForwardY = cameraForward.y;
+            float camForwardZ = cameraForward.z;
+
+            float camRightX = cameraRight.x;
+            float camRightY = cameraRight.y;
+            float camRightZ = cameraRight.z;
+
+            photonView.RPC("ServerMovesPlayer", _server, player, v, h,
+                camForwardX, camForwardY, camForwardZ,
+                camRightX, camRightY, camRightZ
+            );
         }
 
         public void RequestShoot(Photon.Realtime.Player player)
         {
             photonView.RPC("Shoot", _server, player);
         }
-        
-        
+
+
         /* Requests que recibe el SERVER para gestionar a los jugadores */
         [PunRPC]
-        void Move(Photon.Realtime.Player player, float v, float h)
+        void ServerMovesPlayer(Photon.Realtime.Player player, float v, float h, 
+            float camForwardX, float camForwardY, float camForwardZ,
+            float camRightX, float camRightY, float camRightZ)
         {
             if (_dicModels.ContainsKey(player))
             {
                 Debug.Log("[Server] Server moves player...");
-                _dicModels[player].PlayerMove(v, h);
+                _dicModels[player].PlayerMovedByServer(v, h, 
+                    camForwardX, camForwardY, camForwardZ,
+                    camRightX, camRightY, camRightZ);
             }
         }
 

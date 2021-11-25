@@ -20,13 +20,17 @@ public class PlayerController //ALL THE INPUT HERE
         Debug.Log($"OnUpdate called by {_player.name}");
         float h = Input.GetAxis("Horizontal");
         float v = Input.GetAxis("Vertical");
+        
+        Vector3 cameraForward = new Vector3(_player.cam.transform.forward.x, _player.transform.forward.y, _player.cam.transform.forward.z);
+        Vector3 cameraRight = new Vector3(_player.cam.transform.right.x, _player.transform.forward.y, _player.cam.transform.right.z);
 
+        // al server le tengo que pasar el forward de la cam, y me tiene que configurar la velocity
         if ((v != 0 || h != 0))
         {
-            FAServer.Instance.RequestMove(_player.GetOwner(), v, h);
+            FAServer.Instance.RequestMove(_player.GetOwner(), v, h, cameraForward, cameraRight);
             //_player.Move(v, h);
         } //Move
-        else FAServer.Instance.RequestMove(_player.GetOwner(), 0, 0);
+        else FAServer.Instance.RequestMove(_player.GetOwner(), 0, 0,  cameraForward, cameraRight);
 
         if (Input.GetKey(KeyCode.Space))
         {

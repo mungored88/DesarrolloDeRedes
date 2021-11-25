@@ -38,7 +38,8 @@ public class Player : Entity , ICollector, IDamageable, IObservable
     public float armor;
     PlayerController _control;
     PlayerView _playerView;
-    Movement _movement;
+    
+    // Movement _movement;
     BattleMechanics _battleMechanics;
     SoundMananger _soundMananger;
     AnimatorController _animatorController;
@@ -58,6 +59,11 @@ public class Player : Entity , ICollector, IDamageable, IObservable
     //Debug pourpuse
     public Transform CtSpawn;
     public Transform MafiaSpawn;
+    
+    
+    // Delegate para el movimiento
+    public delegate void ControlDelegate();
+    private ControlDelegate _controlDelegate = () => { };
 
     private void Start()
     {
@@ -71,18 +77,8 @@ public class Player : Entity , ICollector, IDamageable, IObservable
             return;
         }
     }
-
-    public Photon.Realtime.Player GetServerReference()
-    {
-        return _serverReference;
-    }
-
-
-    // ya no voy a tener mas Update, porque me va a controlar el server....
-    public delegate void ControlDelegate();
-    private ControlDelegate _controlDelegate = () => { };
-
-    void Update()
+    
+    private void Update()
     {
         // TODO: solo lo tiene que hacer cada cliente
         _controlDelegate.Invoke();
@@ -92,9 +88,19 @@ public class Player : Entity , ICollector, IDamageable, IObservable
         // if (Input.GetKeyDown(KeyCode.B)) { GetDamage(25); }
     }
 
+    public Photon.Realtime.Player GetServerReference()
+    {
+        return _serverReference;
+    }
+
     public Photon.Realtime.Player GetOwner()
     {
         return _owner;
+    }
+
+    public Rigidbody GetRigidbody()
+    {
+        return _rb;
     }
 
     UIManager playerUiM;
@@ -102,16 +108,17 @@ public class Player : Entity , ICollector, IDamageable, IObservable
     {
         // owner es el current player
         _owner = localPlayer;
-        _movement = new Movement(this, cam);
+        // _movement = new Movement(this, cam);
+        _rb = GetComponent<Rigidbody>();
         
         // le mando al player un RPC para que setee sus parametros
-        photonView.RPC("SetPlayerLocalParams", localPlayer, _owner, _movement);
+        photonView.RPC("SetPlayerLocalParams", localPlayer, _owner);
         
         return this;
     }
 
     [PunRPC]
-    private void SetPlayerLocalParams(Photon.Realtime.Player localPlayer, Movement movement)
+    private void SetPlayerLocalParams(Photon.Realtime.Player localPlayer)
     {
         _owner = localPlayer;
         Debug.Log("--- [Client] player setea sus propios parametros");
@@ -123,8 +130,8 @@ public class Player : Entity , ICollector, IDamageable, IObservable
         _soundMananger = new SoundMananger();
         _animatorController = new AnimatorController(_animator);
         _playerView = new PlayerView(this, _animatorController, _soundMananger);
-        _movement = movement;
-        _movement.SetCam(cam);
+        // _movement = new Movement(this, cam);;
+        SetCam(cam);
         // ------------
 
         // Start
@@ -156,6 +163,58 @@ public class Player : Entity , ICollector, IDamageable, IObservable
         _controlDelegate += _control.OnUpdate;
     }
 
+    public void MovementAim()
+    {
+        if (isRolling) return;
+        _cameraForward = new Vector3(cam.transform.forward.x, transform.forward.y, cam.transform.forward.z);
+        transform.forward = _cameraForward.normalized;
+    }
+    
+    public void MovementRoll()
+    {
+        Vector3 direction = transform.forward;
+        _rb.AddForce(direction * _jumpForce, ForceMode.Impulse);
+        isRolling = false;
+    }
+
+    # region MOVEMENT
+    
+    Vector3 _cameraForward;
+    Vector3 _cameraRight;
+    public void SetCam(Camera c)
+    {
+        _cameraForward = new Vector3(cam.transform.forward.x, transform.forward.y, cam.transform.forward.z);
+        _cameraRight = new Vector3(cam.transform.right.x, transform.forward.y, cam.transform.right.z);
+        
+        SetMovementTypes();
+    }
+    
+    IMovementMode myCurrentMovementMode;
+    IMovementMode MMNormal;
+    IMovementMode MMCrouch;
+    IMovementMode MMPreroll;
+    Rigidbody _rb;
+    float _jumpForce = 2500f;
+    //float _rotateSpeed = 500f;
+
+    public float turnSmoothTime = 0.1f;
+    public void SetMovementTypes()
+    {
+        MMNormal = new NormalMovement(cam.transform, this, _rb, speed);
+        MMCrouch = new CrouchedMovement(cam.transform, this, _rb, speed);
+        MMPreroll = new PrerollMovement(cam.transform, this, _rb, speed);
+
+        myCurrentMovementMode = MMNormal;
+    }
+    
+    public void MovementChangeMovementMode(MovementMode tipo)
+    {
+        if (tipo == MovementMode.NORMAL) { myCurrentMovementMode = MMNormal; }
+        else if (tipo == MovementMode.CROUCHED) { myCurrentMovementMode = MMCrouch; }
+        else if (tipo == MovementMode.PREROLL) { myCurrentMovementMode = MMPreroll; }
+    }
+
+    # endregion
 
     #region LIFE_STUFF
     public void GetDamage(float dmg)
@@ -187,30 +246,43 @@ public class Player : Entity , ICollector, IDamageable, IObservable
     }
     #endregion
 
-    #region MOVEMENT
+    #region MOVEMENT ORIG
     internal void Aim()
     {
-        _movement.Aim();
+        MovementAim();
     }
-    internal void PlayerMove(float v, float h)
+    
+    // llamada por el cliente, se ejecuta en el server
+    public void PlayerMovedByServer(float v, float h, 
+        float camForwardX, float camForwardY, float camForwardZ,
+        float camRightX, float camRightY, float camRightZ)
     {
+        Vector3 _cameraForward = new Vector3(camForwardX, camForwardY, camForwardZ);
+        Vector3 _cameraRight = new Vector3(camRightX, camRightY, camRightZ);
+        
+        Vector3 X = _cameraRight * h * speed;
+        Vector3 Y = new Vector3(0f, _rb.velocity.y, 0f);
+        Vector3 Z = _cameraForward * v * speed;
+        GetRigidbody().velocity = (Z + Y + X);
+        
         // TODO: Exception: Write failed. Custom type not found: Movement
-        _movement.Move(v, h);
+        //myCurrentMovementMode.Move(v, h);
         
         // TODO: Server
         //_playerView.animator.Move(h,v);
     }
+    
     internal void Roll()
     {
         // TODO: Server
-        _movement.Roll();
+        MovementRoll();
         _playerView.animator.Roll();
     }
     internal void ChangeMovementMode(MovementMode mm)
     {
         if (mm == MovementMode.CROUCHED) _playerView.animator.Crouch(true);
         else _playerView.animator.Crouch(false);
-        _movement.ChangeMovementMode(mm);
+        MovementChangeMovementMode(mm);
 
     }
 
