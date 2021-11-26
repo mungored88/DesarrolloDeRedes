@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using ExitGames.Client.Photon;
 using Photon.Pun;
+using Photon.Realtime;
 using UnityEngine;
 
 namespace redes.parcial_2
 {
     public class FAServer : MonoBehaviourPun
     {
+        public int maxPlayerCount = 4;
+        
         public static FAServer Instance; //SINGLETON
 
         Photon.Realtime.Player _server; //Referencia del Host real (y no de los avatares)
@@ -55,6 +58,7 @@ namespace redes.parcial_2
 
             PackagePerSecond = 60;
 
+            // loads level for the server
             PhotonNetwork.LoadLevel(sceneIndex);
 
             var playerLocal = PhotonNetwork.LocalPlayer;
@@ -70,6 +74,13 @@ namespace redes.parcial_2
         {
             Debug.Log("--- [Server] Agrego al player a la lista de players");
             StartCoroutine(WaitForLevel(player));
+            if (PhotonNetwork.PlayerList.Length == maxPlayerCount)
+            {
+                Debug.Log("--- [Server] Todos los players ONLINE. Creo enemigos");
+                // Instantiate enemies
+                FindObjectOfType<EnemySceneSpawner>().InstantiateEnemiesAfterAllPlayerConnect();
+                // habilito a todos los otros players
+            }
         }
 
         IEnumerator WaitForLevel(Photon.Realtime.Player player)
@@ -80,7 +91,7 @@ namespace redes.parcial_2
             // {
             //     yield return new WaitForSeconds(0.15f);
             // }
-
+            
             while (PhotonNetwork.LevelLoadingProgress > 0.9f)
             {
                 yield return new WaitForEndOfFrame();
@@ -106,8 +117,8 @@ namespace redes.parcial_2
         /* REQUESTS (SERVERS AVATARES)*/
 
         //Esto lo recibe del Controller y llama por RPC a la funcion MOVE del host real
-        public void RequestMove(Photon.Realtime.Player player, float v, float h, Vector3 cameraForward,
-            Vector3 cameraRight)
+        public void RequestMove(Photon.Realtime.Player player, float v, float h, 
+            Vector3 cameraForward, Vector3 cameraRight)
         {
             float camForwardX = cameraForward.x;
             float camForwardY = cameraForward.y;
@@ -117,7 +128,11 @@ namespace redes.parcial_2
             float camRightY = cameraRight.y;
             float camRightZ = cameraRight.z;
 
-            photonView.RPC("ServerMovesPlayer", _server, player, v, h,
+            // Dont send a request unless the player presses the input button
+            if (v == 0 & h == 0) return;
+
+            photonView.RPC("ServerMovesPlayer", _server, 
+                player, v, h,
                 camForwardX, camForwardY, camForwardZ,
                 camRightX, camRightY, camRightZ
             );
@@ -138,9 +153,12 @@ namespace redes.parcial_2
             if (_dicModels.ContainsKey(player))
             {
                 Debug.Log("[Server] Server moves player...");
+                
                 _dicModels[player].PlayerMovedByServer(v, h, 
                     camForwardX, camForwardY, camForwardZ,
                     camRightX, camRightY, camRightZ);
+                // Animator update
+                _dicModels[player].AnimatorUpdateByServer(v, h);
             }
         }
 

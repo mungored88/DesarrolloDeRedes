@@ -12,7 +12,7 @@ using UnityEngine.Experimental.PlayerLoop;
 public class Player : Entity , ICollector, IDamageable, IObservable
 {
     private Photon.Realtime.Player _owner; // El "ID" para saber a quien representa este Model
-    private Photon.Realtime.Player _serverReference; // referencia al servidor (a quien enviarle requests)
+    // private Photon.Realtime.Player _serverReference; // referencia al servidor (a quien enviarle requests)
     
     [Header("Movement")]
     public float speed;
@@ -42,7 +42,7 @@ public class Player : Entity , ICollector, IDamageable, IObservable
     // Movement _movement;
     BattleMechanics _battleMechanics;
     SoundMananger _soundMananger;
-    AnimatorController _animatorController;
+    // AnimatorController _animatorController;
     public Animator _animator;
     public Camera cam;
 
@@ -88,10 +88,10 @@ public class Player : Entity , ICollector, IDamageable, IObservable
         // if (Input.GetKeyDown(KeyCode.B)) { GetDamage(25); }
     }
 
-    public Photon.Realtime.Player GetServerReference()
-    {
-        return _serverReference;
-    }
+    //public Photon.Realtime.Player GetServerReference()
+    //{
+    //    return _serverReference;
+    //}
 
     public Photon.Realtime.Player GetOwner()
     {
@@ -110,6 +110,9 @@ public class Player : Entity , ICollector, IDamageable, IObservable
         _owner = localPlayer;
         // _movement = new Movement(this, cam);
         _rb = GetComponent<Rigidbody>();
+        _animator = GetComponent<Animator>();
+        
+        _animator.SetBool("IsShooting", true);
         
         // le mando al player un RPC para que setee sus parametros
         photonView.RPC("SetPlayerLocalParams", localPlayer, _owner);
@@ -125,11 +128,11 @@ public class Player : Entity , ICollector, IDamageable, IObservable
         
         // Awake
         _control = new PlayerController(this);
-        _animator = this.GetComponent<Animator>();
+        
         cam = Camera.main;
         _soundMananger = new SoundMananger();
-        _animatorController = new AnimatorController(_animator);
-        _playerView = new PlayerView(this, _animatorController, _soundMananger);
+        // _animatorController = new AnimatorController(_animator);
+        _playerView = new PlayerView(this, _soundMananger);
         // _movement = new Movement(this, cam);;
         SetCam(cam);
         // ------------
@@ -176,6 +179,25 @@ public class Player : Entity , ICollector, IDamageable, IObservable
         _rb.AddForce(direction * _jumpForce, ForceMode.Impulse);
         isRolling = false;
     }
+    
+    # region ANIMATOR
+    public void AnimatorControllerRoll()
+    {
+        _animator.SetTrigger("Rolling");
+    }
+
+    public void AnimatorControllerCrouch(bool crouch)
+    {
+        _animator.SetBool("Crouched", crouch);
+    }
+
+    public void AnimatorControllerDie()
+    { 
+        _animator.SetTrigger("Death");
+        _animator.SetLayerWeight(_animator.GetLayerIndex("Shoot"), 0);
+    }
+    
+    # endregion
 
     # region MOVEMENT
     
@@ -219,7 +241,7 @@ public class Player : Entity , ICollector, IDamageable, IObservable
     #region LIFE_STUFF
     public void GetDamage(float dmg)
     {
-        // TODO: Server
+        // TODO: este evento se llama en el server y en el client. hacer que se llame solo en el server?
         life -= dmg;
         onUpdateLife(life);
 
@@ -231,7 +253,7 @@ public class Player : Entity , ICollector, IDamageable, IObservable
         // TODO: Server
         if (PlayerLost != null) PlayerLost(this);
 
-        _playerView.animator.Die();
+        AnimatorControllerDie();
         this.enabled = false;
         Invoke("changeScene",5);
     }
@@ -246,12 +268,8 @@ public class Player : Entity , ICollector, IDamageable, IObservable
     }
     #endregion
 
-    #region MOVEMENT ORIG
-    internal void Aim()
-    {
-        MovementAim();
-    }
-    
+    #region SERVER METHODS
+
     // llamada por el cliente, se ejecuta en el server
     public void PlayerMovedByServer(float v, float h, 
         float camForwardX, float camForwardY, float camForwardZ,
@@ -264,29 +282,34 @@ public class Player : Entity , ICollector, IDamageable, IObservable
         Vector3 Y = new Vector3(0f, _rb.velocity.y, 0f);
         Vector3 Z = _cameraForward * v * speed;
         GetRigidbody().velocity = (Z + Y + X);
-        
-        // TODO: Exception: Write failed. Custom type not found: Movement
-        //myCurrentMovementMode.Move(v, h);
-        
-        // TODO: Server
-        //_playerView.animator.Move(h,v);
+    }
+
+    public void AnimatorUpdateByServer(float v, float h)
+    {
+        _animator.SetFloat("Speed_Forward", v);
+        _animator.SetFloat("Speed_Right", h);
+    }
+
+    #endregion
+    
+    internal void Aim()
+    {
+        MovementAim();
     }
     
     internal void Roll()
     {
         // TODO: Server
         MovementRoll();
-        _playerView.animator.Roll();
+        AnimatorControllerRoll();
     }
     internal void ChangeMovementMode(MovementMode mm)
     {
-        if (mm == MovementMode.CROUCHED) _playerView.animator.Crouch(true);
-        else _playerView.animator.Crouch(false);
+        if (mm == MovementMode.CROUCHED) AnimatorControllerCrouch(true);
+        else AnimatorControllerCrouch(false);
         MovementChangeMovementMode(mm);
 
     }
-
-    #endregion
 
     #region BATTLE_MECHANICS
     public bool shooting

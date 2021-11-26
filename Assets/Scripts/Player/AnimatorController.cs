@@ -10,21 +10,21 @@ public class AnimatorController
         _anim.SetBool("IsShooting", true);
 
     }
-    public void Move(float h, float v) {
+    public void AnimatorControllerMove(float h, float v) {
         _anim.SetFloat("Speed_Forward", v);
         _anim.SetFloat("Speed_Right", h);
     }
-    public void Roll()
+    public void AnimatorControllerRoll()
     {
         _anim.SetTrigger("Rolling");
     }
 
-    public void Crouch(bool crouch)
+    public void AnimatorControllerCrouch(bool crouch)
     {
         _anim.SetBool("Crouched", crouch);
     }
 
-    public void Die()
+    public void AnimatorControllerDie()
     { 
         _anim.SetTrigger("Death");
         _anim.SetLayerWeight(_anim.GetLayerIndex("Shoot"), 0);

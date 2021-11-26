@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Photon.Pun;
+using redes.parcial_2;
 using UnityEngine;
 
 public class Pathfinding : MonoBehaviour
@@ -37,13 +38,16 @@ public class Pathfinding : MonoBehaviour
 
     private void Update()
     {
-        if (PlayerList.Count < 2)
+        if (PlayerList.Count < FAServer.Instance.maxPlayerCount)
         {
             PlayerList = FindObjectsOfType<Player>().ToList();
         }
         // if the scene has no players, then do nothing
-        if (PhotonNetwork.PlayerList.Length == 0) return;
-        
+        if (PhotonNetwork.PlayerList.Length == 0)
+        {
+            Debug.Log("--- [Enemy] no hay players. No hago nada");
+            return;
+        }
         
         SetNearestPlayer();
         try
@@ -63,7 +67,7 @@ public class Pathfinding : MonoBehaviour
     {
         try
         {
-            if (PhotonNetwork.PlayerList.Length == 1)
+            if (PhotonNetwork.PlayerList.Length == 2)
             {
                 TargetPosition = PlayerList[0].transform;
             }

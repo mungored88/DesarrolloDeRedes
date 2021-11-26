@@ -12,12 +12,13 @@ public class EnemySceneSpawner : MonoBehaviourPun
     public GameObject enemyPrefab;
     public GameObject parentGameobject;
 
-    private void Awake()
+    // Executed by the server only
+    public void InstantiateEnemiesAfterAllPlayerConnect()
     {
         var playerLocal = PhotonNetwork.LocalPlayer;
         
         
-        // si no soy el primer cliente conectado, no quiero crear enemigos
+        // si no soy el Server, no creo enemigos
         if (!Equals(FAServer.Instance.getPlayerServer(), playerLocal)) return;
         
         spawnerPositions = GetComponentsInChildren<Transform>().ToList();
