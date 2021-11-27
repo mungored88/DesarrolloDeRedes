@@ -79,7 +79,11 @@ namespace redes.parcial_2
                 Debug.Log("--- [Server] Todos los players ONLINE. Creo enemigos");
                 // Instantiate enemies
                 FindObjectOfType<EnemySceneSpawner>().InstantiateEnemiesAfterAllPlayerConnect();
-                // habilito a todos los otros players
+                // destruyo las paredes
+                foreach (LobbyWall lobbyWall in FindObjectsOfType<LobbyWall>())
+                {
+                    PhotonNetwork.Destroy(lobbyWall.gameObject);
+                }
             }
         }
 
@@ -107,6 +111,7 @@ namespace redes.parcial_2
                 .Instantiate(characterPrefab.name, p1Position.position, Quaternion.identity)
                 .GetComponent<Player>()
                 .SetInitialParameters(player);
+            newCharacter.enabled = false;
 
             Debug.Log($"--- [Server] Player {newCharacter.name} instanciado");
             _dicModels.Add(player, newCharacter);
