@@ -16,6 +16,8 @@ GameObject:
   - component: {fileID: 4238859964584017289}
   - component: {fileID: 4747873567369652444}
   - component: {fileID: 4661409351386367517}
+  - component: {fileID: 1927589213145505111}
+  - component: {fileID: 3763827855610306580}
   m_Layer: 14
   m_Name: RpgAmmo
   m_TagString: Untagged
@@ -61,7 +63,6 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -239,6 +240,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bulletTransform: {fileID: 0}
   speed: 120
+  damage: 10
   lifeTime: 5
   force: 100
   explosionDistance: 100
@@ -248,6 +250,62 @@ MonoBehaviour:
     m_Bits: 4294967295
   explotionEffect: {fileID: 1121192042590650, guid: 6462dc071b1ca0d408cdd81dc54b067f,
     type: 3}
+--- !u!114 &1927589213145505111
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1411799994709084940}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8efc6b1d64977384eb3405357896c656, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_PositionModel:
+    SynchronizeEnabled: 1
+    TeleportEnabled: 1
+    TeleportIfDistanceGreaterThan: 3
+    InterpolateOption: 2
+    InterpolateMoveTowardsSpeed: 1
+    InterpolateLerpSpeed: 1
+    ExtrapolateOption: 0
+    ExtrapolateSpeed: 1
+    ExtrapolateIncludingRoundTripTime: 1
+    ExtrapolateNumberOfStoredPositions: 1
+  m_RotationModel:
+    SynchronizeEnabled: 0
+    InterpolateOption: 1
+    InterpolateRotateTowardsSpeed: 180
+    InterpolateLerpSpeed: 5
+  m_ScaleModel:
+    SynchronizeEnabled: 0
+    InterpolateOption: 0
+    InterpolateMoveTowardsSpeed: 1
+    InterpolateLerpSpeed: 0
+--- !u!114 &3763827855610306580
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1411799994709084940}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents:
+  - {fileID: 1927589213145505111}
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1001 &385802929218008484
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -371,12 +429,12 @@ PrefabInstance:
     - target: {fileID: 199086891411180386, guid: bccc7a794e75b2a44a4b0dac69160b7b,
         type: 3}
       propertyPath: m_Materials.Array.size
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 199355249067051742, guid: bccc7a794e75b2a44a4b0dac69160b7b,
         type: 3}
       propertyPath: m_Materials.Array.size
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bccc7a794e75b2a44a4b0dac69160b7b, type: 3}
@@ -512,6 +570,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 199092248008267778, guid: 61bb62591466c3649bdf4905822d72f6,
         type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 199092248008267778, guid: 61bb62591466c3649bdf4905822d72f6,
+        type: 3}
       propertyPath: m_Flip.x
       value: 0.5
       objectReference: {fileID: 0}
@@ -520,10 +583,10 @@ PrefabInstance:
       propertyPath: m_Flip.y
       value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 199092248008267778, guid: 61bb62591466c3649bdf4905822d72f6,
+    - target: {fileID: 199287826736471690, guid: 61bb62591466c3649bdf4905822d72f6,
         type: 3}
       propertyPath: m_Materials.Array.size
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 199287826736471690, guid: 61bb62591466c3649bdf4905822d72f6,
         type: 3}
@@ -534,11 +597,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Flip.y
       value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 199287826736471690, guid: 61bb62591466c3649bdf4905822d72f6,
-        type: 3}
-      propertyPath: m_Materials.Array.size
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 61bb62591466c3649bdf4905822d72f6, type: 3}

@@ -150,6 +150,7 @@ public class Player : Entity , ICollector, IDamageable, IObservable
         
         // Setea la UI de los objetivos
         playerUiM = GetComponent<UIManager>();
+        playerUiM.SetPlayer(this);
 
         // Hacemos lo que antes hacia el Start
         activeWeapon.BulletOrigin = bulletOrigin;

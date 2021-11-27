@@ -65,6 +65,11 @@ public class UIManager : MonoBehaviourPun
         boxfood.OnGrab += ObjetiveTextFood;
     }
 
+    public void SetPlayer(Player player)
+    {
+        _player = player;
+    }
+
     public void UpdateAmmoCount(Ammo ammo)
     {
         this.ammo.text = ammo.AMMO.ToString();  
