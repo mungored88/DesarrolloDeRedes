@@ -110,11 +110,25 @@ namespace redes.parcial_2
 
             Debug.Log($"--- [Server] Player {newCharacter.name} instanciado");
             _dicModels.Add(player, newCharacter);
-
-            // _dicViews.Add(player, newCharacter.GetComponent<CharacterViewFA>());
         }
 
         /* REQUESTS (SERVERS AVATARES)*/
+        public void RequestDamagePlayer(Photon.Realtime.Player player, float dmg)
+        {
+            if (player != _server)
+            {
+                _dicModels[player].PlayerDamagedByServer(player, dmg);
+                //Debug.Log("--- [Cliente] Daño al player. Le envio el mensaje");
+                //photonView.RPC("ServerDamagesPlayer", _server, player, dmg);
+            }
+        }
+        
+        //[PunRPC]
+        //private void ServerDamagesPlayer(Photon.Realtime.Player player, float dmg)
+        //{
+        //    
+        //    _dicModels[player].PlayerDamagedByServer(player, dmg);
+        //}
 
         //Esto lo recibe del Controller y llama por RPC a la funcion MOVE del host real
         public void RequestMove(Photon.Realtime.Player player, float v, float h, 
@@ -138,15 +152,10 @@ namespace redes.parcial_2
             );
         }
 
-        public void RequestShoot(Photon.Realtime.Player player)
-        {
-            photonView.RPC("Shoot", _server, player);
-        }
-
 
         /* Requests que recibe el SERVER para gestionar a los jugadores */
         [PunRPC]
-        void ServerMovesPlayer(Photon.Realtime.Player player, float v, float h, 
+        private void ServerMovesPlayer(Photon.Realtime.Player player, float v, float h, 
             float camForwardX, float camForwardY, float camForwardZ,
             float camRightX, float camRightY, float camRightZ)
         {
@@ -162,6 +171,11 @@ namespace redes.parcial_2
             }
         }
 
+        public void RequestShoot(Photon.Realtime.Player player)
+        {
+            photonView.RPC("Shoot", _server, player);
+        }
+
         [PunRPC]
         void Shoot(Photon.Realtime.Player player)
         {
@@ -171,7 +185,12 @@ namespace redes.parcial_2
             }
         }
 
-
+        public void SendServerPlayerDisconnect(Photon.Realtime.Player player)
+        {
+            photonView.RPC("PlayerDisconnect", _server, player);
+        }
+        
+        [PunRPC]
         public void PlayerDisconnect(Photon.Realtime.Player player)
         {
             PhotonNetwork.Destroy(_dicModels[player].gameObject);

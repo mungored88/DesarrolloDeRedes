@@ -129,6 +129,9 @@ public class Player : Entity , ICollector, IDamageable, IObservable
         // Awake
         _control = new PlayerController(this);
         
+        // seteado de nuevo, pero del lado del cliente
+        _animator = GetComponent<Animator>();
+        
         cam = Camera.main;
         _soundMananger = new SoundMananger();
         // _animatorController = new AnimatorController(_animator);
@@ -239,37 +242,16 @@ public class Player : Entity , ICollector, IDamageable, IObservable
     # endregion
 
     #region LIFE_STUFF
-    public void GetDamage(float dmg)
-    {
-        // TODO: este evento se llama en el server y en el client. hacer que se llame solo en el server?
-        life -= dmg;
-        onUpdateLife(life);
-
-        if (life <= 0) Die();
-    }
-    
-    public void Die()
-    {
-        // TODO: Server
-        if (PlayerLost != null) PlayerLost(this);
-
-        AnimatorControllerDie();
-        this.enabled = false;
-        Invoke("changeScene",5);
-    }
-    public delegate void NotifyPlayerDie(Player T);
-    public static NotifyPlayerDie PlayerLost;
-
 
     //deberia estar en un game manager :)
-    public void changeScene()
+    public void SendDeadStatusToServerAndchangeScene()
     {
+        FAServer.Instance.SendServerPlayerDisconnect(GetOwner());
         UnityEngine.SceneManagement.SceneManager.LoadScene("Defeat");
     }
     #endregion
 
-    #region SERVER METHODS
-
+    #region SERVER METHODS (AND EXECUTED BY THE CLIENTS)
     // llamada por el cliente, se ejecuta en el server
     public void PlayerMovedByServer(float v, float h, 
         float camForwardX, float camForwardY, float camForwardZ,
@@ -283,6 +265,26 @@ public class Player : Entity , ICollector, IDamageable, IObservable
         Vector3 Z = _cameraForward * v * speed;
         GetRigidbody().velocity = (Z + Y + X);
     }
+    
+    public void PlayerDamagedByServer(Photon.Realtime.Player player, float dmg)
+    {
+        Debug.Log("--- [Server] Le saco vida al player");
+        life -= dmg;
+        
+        if (life <= 0)
+        {
+            photonView.RPC("UpdatePlayerUIAfterDamageByServer", player, life);
+            
+            Debug.Log($"--- [Server] El player {player.ActorNumber} tiene que morir");
+            // mandar mensaje de muerte
+            photonView.RPC("PlayerDeadByServer", player);
+        }
+        else
+        {
+            // le mando al cliente el mensaje de que actualice su UI
+            photonView.RPC("UpdatePlayerUIAfterDamageByServer", player, life);
+        }
+    }
 
     public void AnimatorUpdateByServer(float v, float h)
     {
@@ -291,6 +293,44 @@ public class Player : Entity , ICollector, IDamageable, IObservable
     }
 
     #endregion
+
+    [PunRPC]
+    public void UpdatePlayerUIAfterDamageByServer(float currentLife)
+    {
+        Debug.Log("--- [Cliente] Recibo mensaje de daño. Actualizo UI");
+        life = currentLife;
+        playerUiM.LifeUpdate(currentLife);
+    }
+
+    [PunRPC]
+    public void PlayerDeadByServer()
+    {
+        Die();
+        Invoke("SendDeadStatusToServerAndchangeScene",5);
+    }
+    
+    // DISABLED
+    public void GetDamage(float dmg)
+    {
+        // Llamado por el cliente
+        life -= dmg;
+        // playerUiM.LifeUpdate(life);
+        onUpdateLife(life);
+        if (life <= 0) Die();
+    }
+    
+    
+    // Disabled
+    public void Die()
+    {
+        // TODO: Server
+        if (PlayerLost != null) PlayerLost(this);
+
+        AnimatorControllerDie();
+        this.enabled = false;
+    }
+    public delegate void NotifyPlayerDie(Player T);
+    public static NotifyPlayerDie PlayerLost;
     
     internal void Aim()
     {
@@ -303,6 +343,7 @@ public class Player : Entity , ICollector, IDamageable, IObservable
         MovementRoll();
         AnimatorControllerRoll();
     }
+    
     internal void ChangeMovementMode(MovementMode mm)
     {
         if (mm == MovementMode.CROUCHED) AnimatorControllerCrouch(true);

@@ -109,7 +109,9 @@ public class UIManager : MonoBehaviourPun
         if (wep.IsPrimary) { Selected[0].enabled = true; Selected[1].enabled = false; }
         else{ Selected[1].enabled = true; Selected[0].enabled = false; }
     }
-    public void LifeUpdate(float life){
+    public void LifeUpdate(float life)
+    {
+        if (life < 0) return;
         this.life.text = life.ToString();
     }
     public void UpdateGranadeCount(int[] grenadeCount)

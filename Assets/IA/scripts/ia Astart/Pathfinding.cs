@@ -62,6 +62,10 @@ public class Pathfinding : MonoBehaviour
         {
             // Do nothing. Skip to the next frame update
         }
+        catch (MissingReferenceException)
+        {
+            // Do nothing. Last player died
+        }
     }
     private void SetNearestPlayer()
     {

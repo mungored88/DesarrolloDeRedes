@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using Photon.Pun;
+using redes.parcial_2;
 using UnityEngine;
 
 public class Enemy : Entity , IDamageable
@@ -34,10 +35,14 @@ public class Enemy : Entity , IDamageable
 
     private void OnTriggerEnter(Collider other)
     {
-        if(other.GetComponent<Player>() != null)
+        // Esto lo llama al server, porque los enemies son RoomObjects creados por el server
+        var player = other.GetComponent<Player>();
+        if(player != null && photonView.IsMine)
         {
+            Photon.Realtime.Player localPlayer = player.GetOwner();
             attack.Play();
-            other.GetComponent<IDamageable>().GetDamage(damage);
+            FAServer.Instance.RequestDamagePlayer(localPlayer, damage);
+            // other.GetComponent<IDamageable>().GetDamage(damage);
         }
     }
 }
