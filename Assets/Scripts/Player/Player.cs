@@ -86,6 +86,10 @@ public class Player : Entity , ICollector, IDamageable, IObservable
         //if (Input.GetKeyDown(KeyCode.F1)) { this.transform.position = CtSpawn.position; }
         //if (Input.GetKeyDown(KeyCode.F2)) { this.transform.position = MafiaSpawn.position; }  
         // if (Input.GetKeyDown(KeyCode.B)) { GetDamage(25); }
+        if (life <= 0)
+        {
+            
+        }
     }
 
     //public Photon.Realtime.Player GetServerReference()
@@ -242,16 +246,6 @@ public class Player : Entity , ICollector, IDamageable, IObservable
 
     # endregion
 
-    #region LIFE_STUFF
-
-    //deberia estar en un game manager :)
-    public void SendDeadStatusToServerAndchangeScene()
-    {
-        FAServer.Instance.SendServerPlayerDisconnect(GetOwner());
-        UnityEngine.SceneManagement.SceneManager.LoadScene("Defeat");
-    }
-    #endregion
-
     #region SERVER METHODS (AND EXECUTED BY THE CLIENTS)
     // llamada por el cliente, se ejecuta en el server
     public void PlayerMovedByServer(float v, float h, 
@@ -307,17 +301,17 @@ public class Player : Entity , ICollector, IDamageable, IObservable
     public void PlayerDeadByServer()
     {
         Die();
-        Invoke("SendDeadStatusToServerAndchangeScene",5);
+        FAServer.Instance.SendServerPlayerDisconnect(GetOwner());
     }
     
     // DISABLED
     public void GetDamage(float dmg)
     {
         // Llamado por el cliente
-        life -= dmg;
-        // playerUiM.LifeUpdate(life);
-        onUpdateLife(life);
-        if (life <= 0) Die();
+        // life -= dmg;
+        // // playerUiM.LifeUpdate(life);
+        // onUpdateLife(life);
+        // if (life <= 0) Die();
     }
     
     
@@ -445,7 +439,6 @@ public class Player : Entity , ICollector, IDamageable, IObservable
     }
 
     #endregion
-
 
 }
 

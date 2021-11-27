@@ -193,9 +193,27 @@ namespace redes.parcial_2
         [PunRPC]
         public void PlayerDisconnect(Photon.Realtime.Player player)
         {
+            // si soy server, hago esto
             PhotonNetwork.Destroy(_dicModels[player].gameObject);
             _dicModels.Remove(player);
             // _dicViews.Remove(player);
+            
+            photonView.RPC("ShowDefeatScreen", player);
+            // Invoke("SendDeadStatusToServerAndchangeScene",5);
+            
+            // si no soy server, como destruyo a ese enemigo?
+        }
+
+        [PunRPC]
+        public void ShowDefeatScreen()
+        {
+            Invoke("SendDeadStatusToServerAndchangeScene",5);
+        }
+        
+        //deberia estar en un game manager :)
+        public void SendDeadStatusToServerAndchangeScene()
+        {
+            UnityEngine.SceneManagement.SceneManager.LoadScene("Defeat");
         }
     }
 }
