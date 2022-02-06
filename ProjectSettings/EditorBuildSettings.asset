@@ -6,15 +6,15 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/Modelo y Algorimo scene/Menu.unity
+    path: Assets/Scenes/redes/Menu.unity
     guid: 6202eec34a3c051438e9e67fc6825a52
   - enabled: 1
-    path: Assets/Scenes/Modelo y Algorimo scene/Level.unity
+    path: Assets/Scenes/redes/Level.unity
     guid: 7a8812231d3d85f4ab2d85da6a1c2ac2
   - enabled: 1
-    path: Assets/Scenes/Modelo y Algorimo scene/Defeat.unity
+    path: Assets/Scenes/redes/Defeat.unity
     guid: 0e8806684d19886419a6d68fbfb9eb21
   - enabled: 1
-    path: Assets/Scenes/Modelo y Algorimo scene/win.unity
+    path: Assets/Scenes/redes/win.unity
     guid: d30e4eacabe605b418bc12d73df13a94
   m_configObjects: {}
