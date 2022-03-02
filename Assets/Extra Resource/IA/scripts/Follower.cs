@@ -56,8 +56,6 @@ public class Follower : MonoBehaviour
 			transform.position += new Vector3(dir.x,0,dir.z) * speed * Time.deltaTime;
 			transform.rotation = Quaternion.Slerp(transform.rotation,
 			Quaternion.LookRotation(_player.transform.position - transform.position), 10 * Time.deltaTime);
-
-			
 		}
 
 		else

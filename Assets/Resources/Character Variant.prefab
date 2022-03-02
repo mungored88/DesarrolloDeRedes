@@ -218,7 +218,7 @@ PrefabInstance:
     - {fileID: -4756366833194376908, guid: c347b9cb5eaf6d74897514494e9d7f7c, type: 3}
     - {fileID: -954380852508981791, guid: c347b9cb5eaf6d74897514494e9d7f7c, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: c347b9cb5eaf6d74897514494e9d7f7c, type: 3}
---- !u!114 &2567370659426364974 stripped
+--- !u!114 &2567370659426363657 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8088186414343948792, guid: c347b9cb5eaf6d74897514494e9d7f7c,
     type: 3}
@@ -370,7 +370,7 @@ PrefabInstance:
         type: 3}
       propertyPath: activeWeapon
       value: 
-      objectReference: {fileID: 2567370659426364974}
+      objectReference: {fileID: 2567370659426363657}
     - target: {fileID: 3769900653508314634, guid: 74111b573bcc92b4f814ec095ccc6840,
         type: 3}
       propertyPath: minimapGameObject
