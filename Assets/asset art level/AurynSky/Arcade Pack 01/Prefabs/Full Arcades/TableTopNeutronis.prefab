@@ -719,6 +719,7 @@ GameObject:
   - component: {fileID: 4741428185357256}
   - component: {fileID: 33434245400451916}
   - component: {fileID: 23813650334983648}
+  - component: {fileID: 1370242885328936424}
   m_Layer: 0
   m_Name: TableTopNeutronis
   m_TagString: Untagged
@@ -794,6 +795,19 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+--- !u!65 &1370242885328936424
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1486915432716168}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1.7602109, y: 1.626692, z: 2.5701966}
+  m_Center: {x: -0.038820624, y: 0.83651507, z: -0.000000059604645}
 --- !u!1 &1539180842891196
 GameObject:
   m_ObjectHideFlags: 0
