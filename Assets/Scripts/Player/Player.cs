@@ -301,6 +301,13 @@ public class Player : Entity , ICollector, IDamageable, IObservable
     public void PlayerDeadByServer()
     {
         Die();
+        StartCoroutine(WaitBeforePlayerDiesByServer());
+        // FAServer.Instance.SendServerPlayerDisconnect(GetOwner());
+    }
+
+    private IEnumerator WaitBeforePlayerDiesByServer()
+    {
+        yield return new WaitForSeconds(3);
         FAServer.Instance.SendServerPlayerDisconnect(GetOwner());
     }
     

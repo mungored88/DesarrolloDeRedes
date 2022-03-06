@@ -29,7 +29,7 @@ public class Launcher : MonoBehaviourPunCallbacks
     public override void OnConnectedToMaster()
     {
         RoomOptions options = new RoomOptions();
-        options.MaxPlayers = 4;
+        options.MaxPlayers = 5;
 
         PhotonNetwork.JoinOrCreateRoom("MMsalaFullAuth", options, TypedLobby.Default);
     }
